@@ -9,12 +9,13 @@ HARD_LIMIT_INSERTIONS=200
 SOFT_LIMIT_DELETIONS=300
 HARD_LIMIT_DELETIONS=400
 
-if [[ $REPO_TYPE -eq "mobile" ]]; then
+if [[ $repo_type -eq "mobile" ]]; then
     SOFT_LIMIT_INSERTIONS=300
     HARD_LIMIT_INSERTIONS=400
     SOFT_LIMIT_DELETIONS=600
     HARD_LIMIT_DELETIONS=800
 fi
+  
 
 # number of commits
 
