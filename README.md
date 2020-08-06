@@ -6,7 +6,7 @@ This repository contains several scripts that automate common tasks executed in 
 
 ### Git consistency
 
-- [Script][bash/git-consistency.sh]
+- [Script](bash/git-consistency.sh)
 
 Add to your github workflow the following snippet:
 
@@ -20,17 +20,32 @@ jobs:
   consistency:
     runs-on: ubuntu-latest
     steps:
-    - name: Set repository as working directory
+    - name: Get current project to validate
+      uses: actions/checkout@v2
+      with:
+        path: project
+
+    - name: Get ci tools script
       uses: actions/checkout@v2
       with:
         repository: Fondeadora/ci-tools
         ref: master
-        path: ./ci-tools
+        token: ${{ secrets.CI_TOOLS_TOKEN }}
+        path: ci-tools
+
+    - name: Setup repository references
+      run: |
+        cd project
+        git fetch origin
+        git checkout ${{ github.base_ref }}
+        git checkout ${{ github.head_ref }}
+
     - name: Run git consistency tools
       env: 
         BASE_BRANCH: ${{ github.base_ref }}
-        REPO_TYPE: "mobile|service"
+        CURRENT_BRANCH: ${{ github.head_ref }}
+        REPO_TYPE: "mobile|service" # set to the correct value
       run: |
-        cp ./ci-tools/validation/git-consistency.sh .
-        git-consistency.sh
+        cd project
+        ../ci-tools/validation/git-consistency.sh
 ```
