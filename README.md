@@ -1,5 +1,7 @@
 # CI Tools
 
+![licensed|ethically](https://img.shields.io/badge/licensed-ethically-%234baaaa "Ethically licensed badge")
+
 This repository contains several scripts that automate common tasks executed in within CI
 
 ## How to use
