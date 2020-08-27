@@ -1,0 +1,54 @@
+name: 'Test'
+description: 'Test a service'
+inputs:
+  access_token:
+    description: 'A Github Access Token to download private dependencies'
+    required: true
+  cache_hit:
+    description: 'A boolean indicating if there was a cache hit'
+    required: false
+    default: 'false'
+  env_file:
+    description: 'The path of the .env file'
+    required: false
+    default: '.env'
+  test_command:
+    description: 'The command to run the linter'
+    required: false
+    default: 'pipenv run make test'
+runs:
+  using: 'composite'
+  steps:
+    - name: Add python 3.7 to $PATH
+      run: |
+        echo "::add-path::/opt/hostedtoolcache/Python/3.7.8/x64/bin"
+      shell: bash
+    - name: Install pipenv
+      run: |
+        pip3.7 install pipenv
+      shell: bash
+    - name: Setup Github acces token
+      env:
+        ACCESS_TOKEN: ${{ inputs.access_token}}
+      run: |
+        sudo git config --global url."https://$ACCESS_TOKEN@github.com/".insteadOf "ssh://git@github.com/"
+      shell: bash
+    - name: Install dependencies
+      env:
+        CACHE_HIT: ${{ inputs.cache_hit }}
+      run: |
+        if [ $CACHE_HIT != 'true' ]; then
+          PIPENV_VENV_IN_PROJECT=1 pipenv sync --dev
+        fi
+      shell: bash
+    - name: Setup env variables
+      env:
+        FILE: ${{ inputs.env_file }}
+      run: |
+        if [ -f "$FILE" ]; then
+          source "$FILE"
+        fi
+      shell: bash
+    - name: Run the tests
+      run: ${{ inputs.test_command }}
+      shell: bash

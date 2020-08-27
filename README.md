@@ -75,3 +75,40 @@ jobs:
         cd project
         ../ci-tools/validation/git-consistency.sh
 ```
+
+### Test
+
+Add to your github workflow the following snippet:
+
+```sh
+name: A service to test
+
+on: pull_request
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+
+      - name: Check if we hace cached dependencies
+        uses: actions/cache@v2
+        id: cache-dependencies
+        with:
+          path: .venv
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/Pipfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Test the service
+        uses: Fondeadora/ci-tools/test@master
+        with:
+          access_token: ${{ secrets.ACCESS_TOKEN }}
+          cache_hit: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
+          env_file: .env.example
+          test_command: pipenv run make test
+
+```
