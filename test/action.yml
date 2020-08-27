@@ -1,5 +1,5 @@
-name: "Lint"
-description: "Lint a service"
+name: "Test"
+description: "Test a service"
 inputs:
   access_token:
     description: "A Github Access Token to download private dependencies"
@@ -8,10 +8,14 @@ inputs:
     description: "A boolean indicating if there was a cache hit"
     required: false
     default: "false"
-  lint_command:
+  env_file:
+    description: "The path of the .env file"
+    required: false
+    default: ".env.example"
+  test_command:
     description: "The command to run the linter"
     required: false
-    default: "pipenv run make lint"
+    default: "pipenv run make test"
   python_version:
     description: "Python version to use"
     required: false
@@ -34,6 +38,6 @@ runs:
         CACHE_HIT: ${{ inputs.cache_hit }}
       run: ${{ github.action_path }}/../common/install-deps.sh
       shell: bash
-    - name: Run the linter
-      run: ${{ inputs.lint_command }}
+    - name: Run the tests
+      run: PIPENV_DOTENV_LOCATION=${{ inputs.env_file }} ${{ inputs.test_command }}
       shell: bash

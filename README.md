@@ -21,13 +21,44 @@ jobs:
         with:
           path: .venv
           key: ${{ runner.os }}-pip-${{ hashFiles('**/Pipfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ hashFiles('**/Pipfile.lock') }}
       - name: lint
         uses: Fondeadora/ci-tools/lint
         with:
           access_token: ${{ secrets.ACCESS_TOKEN }}
           cache_hit: ${{ steps.cache-dependencies.outputs.cache-hit }}
+```
+
+### Test Python project
+
+Add the following to your workflow:
+
+```yaml
+name: A service to test
+
+on: pull_request
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+
+      - name: Check if we hace cached dependencies
+        uses: actions/cache@v2
+        id: cache-dependencies
+        with:
+          path: .venv
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Test the service
+        uses: Fondeadora/ci-tools/test@master
+        with:
+          access_token: ${{ secrets.ACCESS_TOKEN }}
+          cache_hit: ${{ steps.cache-dependencies.outputs.cache-hit }}
+          # env_file: .env.example (Optional)
+          # test_command: pipenv run make test (Optional)
 ```
 
 ### Git consistency
