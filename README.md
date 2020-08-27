@@ -6,6 +6,30 @@ This repository contains several scripts that automate common tasks executed in 
 
 ## How to use
 
+### Lint Python project
+
+Add the following to your workflow:
+
+```yaml
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        id: cache-dependencies
+        with:
+          path: .venv
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/Pipfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ hashFiles('**/Pipfile.lock') }}
+      - name: lint
+        uses: Fondeadora/ci-tools/lint
+        with:
+          access_token: ${{ secrets.ACCESS_TOKEN }}
+          cache_hit: ${{ steps.cache-dependencies.outputs.cache-hit }}
+```
+
 ### Git consistency
 
 - [Script](bash/git-consistency.sh)
@@ -43,7 +67,7 @@ jobs:
         git checkout ${{ github.head_ref }}
 
     - name: Run git consistency tools
-      env: 
+      env:
         BASE_BRANCH: ${{ github.base_ref }}
         CURRENT_BRANCH: ${{ github.head_ref }}
         REPO_TYPE: "mobile|service" # set to the correct value
