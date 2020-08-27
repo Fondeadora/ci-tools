@@ -19,20 +19,20 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Add python version to $PATH
-      run: echo "::add-path::/opt/hostedtoolcache/Python/${{ inputs.python_version }}/x64/bin"
+    - name: Setup Python
+      env:
+        PYTHON_VERSION: ${{ inputs.python_version }}
+      run: ${{ github.action_path }}/../common/python-setup.sh
       shell: bash
-    - name: Install pipenv
-      run: pip3.7 install -q pipenv
-      shell: bash
-    - name: Setup Github acces token
-      run: sudo git config --global url."https://${{ inputs.access_token}}@github.com/".insteadOf "ssh://git@github.com/"
+    - name: Setup Github access token
+      env:
+        ACCESS_TOKEN: ${{ inputs.access_token }}
+      run: ${{ github.action_path }}/../common/git-setup.sh
       shell: bash
     - name: Install dependencies
-      run: |
-        if [ ${{ inputs.cache_hit }} != 'true' ]; then
-          PIPENV_VENV_IN_PROJECT=1 pipenv sync --dev
-        fi
+      env:
+        CACHE_HIT: ${{ inputs.cache_hit }}
+      run: ${{ github.action_path }}/../common/install-deps.sh
       shell: bash
     - name: Run the linter
       run: ${{ inputs.lint_command }}
