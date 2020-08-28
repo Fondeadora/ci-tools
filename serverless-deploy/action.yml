@@ -26,10 +26,6 @@ inputs:
     description: "Python version to use"
     required: false
     default: "3.7.8"
-  node_version:
-    description: "Node version to use"
-    required: false
-    default: "12"
 runs:
   using: "composite"
   steps:
@@ -41,7 +37,7 @@ runs:
     - name: Install serverless dependencies
       env:
         CACHE_HIT: ${{ inputs.cache_hit }}
-      run: ${{ github.action_path }}/../common/install-deps.sh --d 'npm install'
+      run: ${{ github.action_path }}/../common/install-node-deps.sh
       shell: bash
     - name: Setup AWS credentials
       run: |
