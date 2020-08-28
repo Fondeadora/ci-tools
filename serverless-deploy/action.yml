@@ -1,0 +1,55 @@
+name: "Serverless Deploy"
+description: "Deploy a service using serverless"
+inputs:
+  access_token:
+    description: "A Github Access Token to download private dependencies"
+    required: true
+  aws-access-key-id:
+    description: "The AWS access key id to identify the action"
+    required: true
+  aws-secret-access-key:
+    description: "The AWS secret access key to identify the action"
+    required: true
+  aws-region:
+    description: "The AWS region to deploy the service to"
+    required: false
+    default: "us-east-1"
+  stage:
+    description: "The stage to deploy the service"
+    required: false
+    default: "dev"
+  cache_hit:
+    description: "A boolean indicating if there was a cache hit"
+    required: false
+    default: "false"
+  python_version:
+    description: "Python version to use"
+    required: false
+    default: "3.7.8"
+  node_version:
+    description: "Node version to use"
+    required: false
+    default: "12"
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Python
+      env:
+        PYTHON_VERSION: ${{ inputs.python_version }}
+      run: ${{ github.action_path }}/../common/python-setup.sh
+      shell: bash
+    - name: Install serverless dependencies
+      env:
+        CACHE_HIT: ${{ inputs.cache_hit }}
+      run: ${{ github.action_path }}/../common/install-deps.sh --d 'npm install'
+      shell: bash
+    - name: Setup AWS credentials
+      run: |
+        echo "::set-env name=AWS_ACCESS_KEY_ID::${{ inputs.aws-access-key-id }}"
+        echo "::set-env name=AWS_SECRET_ACCESS_KEY::${{ inputs.aws-secret-access-key }}"
+        echo "::set-env name=AWS_DEFAULT_REGION::${{ inputs.aws-region }}"
+        echo "::set-env name=AWS_REGION::${{ inputs.aws-region }}"
+      shell: bash
+    - name: Deploy to the desired stage
+      run: npx sls deploy -s ${{ inputs.stage }}
+      shell: bash
