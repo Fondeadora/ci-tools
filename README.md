@@ -61,48 +61,88 @@ jobs:
           # test_command: pipenv run make test (Optional)
 ```
 
+### Serverless deploy
+
+This will add an action with an event trigger. Add the following to your workflow:
+
+```yaml
+name: Deploy Service
+
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "The stage to deploy the service"
+        required: true
+        default: "dev"
+
+env:
+  STAGE: ${{ github.event.inputs.stage }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        id: cache-dependencies
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+      - name: deploy
+        uses: Fondeadora/ci-tools/serverless-deploy@v1.1.1
+        with:
+          access_token: ${{ secrets.ACCESS_TOKEN }}
+          stage: ${{ env.STAGE }}
+          cache_hit: ${{ steps.cache-dependencies.outputs.cache-hit == 'true' }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+```
+
 ### Git consistency
 
 - [Script](bash/git-consistency.sh)
 
 Add to your github workflow the following snippet:
 
-```sh
+```yaml
 name: Git consistency
 
 on: pull_request
 
 jobs:
-
   consistency:
     runs-on: ubuntu-latest
     steps:
-    - name: Get current project to validate
-      uses: actions/checkout@v2
-      with:
-        path: project
+      - name: Get current project to validate
+        uses: actions/checkout@v2
+        with:
+          path: project
 
-    - name: Get ci tools script
-      uses: actions/checkout@v2
-      with:
-        repository: Fondeadora/ci-tools
-        ref: master
-        token: ${{ secrets.CI_TOOLS_TOKEN }}
-        path: ci-tools
+      - name: Get ci tools script
+        uses: actions/checkout@v2
+        with:
+          repository: Fondeadora/ci-tools
+          ref: master
+          token: ${{ secrets.CI_TOOLS_TOKEN }}
+          path: ci-tools
 
-    - name: Setup repository references
-      run: |
-        cd project
-        git fetch origin
-        git checkout ${{ github.base_ref }}
-        git checkout ${{ github.head_ref }}
+      - name: Setup repository references
+        run: |
+          cd project
+          git fetch origin
+          git checkout ${{ github.base_ref }}
+          git checkout ${{ github.head_ref }}
 
-    - name: Run git consistency tools
-      env:
-        BASE_BRANCH: ${{ github.base_ref }}
-        CURRENT_BRANCH: ${{ github.head_ref }}
-        REPO_TYPE: "mobile|service" # set to the correct value
-      run: |
-        cd project
-        ../ci-tools/validation/git-consistency.sh
+      - name: Run git consistency tools
+        env:
+          BASE_BRANCH: ${{ github.base_ref }}
+          CURRENT_BRANCH: ${{ github.head_ref }}
+          REPO_TYPE: "mobile|service" # set to the correct value
+        run: |
+          cd project
+          ../ci-tools/validation/git-consistency.sh
 ```
