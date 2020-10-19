@@ -1,3 +1,9 @@
+## v1.3.0 (2020-10-19)
+
+### Feat
+
+- update env variables setup to the new workflow commands (#12)
+
 ## v1.2.0 (2020-10-19)
 
 ### Feat
