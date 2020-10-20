@@ -1,3 +1,9 @@
+## v1.4.0 (2020-10-20)
+
+### Feat
+
+- Add stack credentials and change deploy command (#13)
+
 ## v1.3.0 (2020-10-19)
 
 ### Feat
