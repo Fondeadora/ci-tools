@@ -56,6 +56,10 @@ runs:
         echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials  
         echo "region=$AWS_REGION" >> ~/.aws/credentials  
       shell: bash
+    - name: Inspect AWS credentials
+      run: |
+        cat ~/.aws/credentials
+      shell: bash
     - name: Deploy to the desired stage
       run: npx sls deploy --stack ${{ inputs.aws-profile }}
       shell: bash
