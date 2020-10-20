@@ -51,15 +51,13 @@ runs:
         AWS_PROFILE: ${{ inputs.aws-profile }}
       run: |
         mkdir ~/.aws
+        echo "[default]" >> ~/.aws/config
+        echo "region = $AWS_REGION" >> ~/.aws/config
         echo "[$AWS_PROFILE]" >> ~/.aws/credentials
-        echo "aws_acces_key_id=$AWS_ACCESS_KEY_ID" >> ~/.aws/credentials
-        echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials  
-        echo "region=$AWS_REGION" >> ~/.aws/credentials  
-      shell: bash
-    - name: Inspect AWS credentials
-      run: |
-        cat ~/.aws/credentials
+        echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> ~/.aws/credentials
+        echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials  
+        echo "region = $AWS_REGION" >> ~/.aws/credentials  
       shell: bash
     - name: Deploy to the desired stage
-      run: npx sls deploy --stack ${{ inputs.aws-profile }}
+      run: AWS_SDK_LOAD_CONFIG=1 npx sls deploy --stack ${{ inputs.aws-profile }}
       shell: bash
