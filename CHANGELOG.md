@@ -1,3 +1,9 @@
+## v1.4.1 (2020-10-21)
+
+### Fix
+
+- fix serverless-deploy action (#14)
+
 ## v1.4.0 (2020-10-20)
 
 ### Feat
