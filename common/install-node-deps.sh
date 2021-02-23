@@ -1,3 +1,3 @@
 if [ $CACHE_HIT != 'true' ]; then
-    npm install
+    npm ci
 fi
