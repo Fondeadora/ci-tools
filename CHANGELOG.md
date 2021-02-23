@@ -1,3 +1,9 @@
+## v1.4.2 (2021-02-23)
+
+### Fix
+
+- fix serverless deployment action (#15)
+
 ## v1.4.1 (2020-10-21)
 
 ### Fix
