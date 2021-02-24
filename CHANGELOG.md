@@ -1,3 +1,9 @@
+## v1.4.3 (2021-02-24)
+
+### Fix
+
+- python default versioning (#16)
+
 ## v1.4.2 (2021-02-23)
 
 ### Fix
