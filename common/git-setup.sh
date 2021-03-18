@@ -1,6 +1,5 @@
 cat .git/config
-git config --global url."https://$ACCESS_TOKEN@github.com/".insteadOf "ssh://git@github.com/"
+echo -e "[url \"https://$ACCESS_TOKEN@github.com/\"]\n\tinsteadOf = ssh://git@github.com/" | sudo tee -a /etc/gitconfig
 git config --list --show-origin
 cat .git/config
 cat /etc/gitconfig
-cat /home/runner/.gitconfig
